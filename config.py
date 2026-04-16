@@ -1,7 +1,6 @@
 TELEGRAM_BOT_TOKEN = "8752920975:AAGAvIXx03dLuE0f3S3GwgXpMTEIEUfRNAI"
 TELEGRAM_CHAT_ID   = "6500104371"
 MAX_PRICE   = 1000
-MAX_ROOMS   = 1.5
 CITY        = "Sion"
 ZIP_CODE    = "1950"
 CENTER_KEYWORDS = ["centre","center","vieille ville","place du midi","rue de lausanne","rue de la porte neuve","grand pont","rue des châteaux","rue du rhône","rue de conthey","av. de la gare","avenue de la gare","rue du scex","rue de la dixence","place de la planta","rue des vergers","rue du pré","rue du collège","av. ritz","avenue ritz","quartier historique","1950"]

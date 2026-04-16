@@ -1,6 +1,6 @@
 import re
 import logging
-from config import CENTER_KEYWORDS, MAX_PRICE, MAX_ROOMS
+from config import CENTER_KEYWORDS, MAX_PRICE
 
 logger = logging.getLogger(__name__)
 
@@ -27,11 +27,10 @@ def is_center(titre, adresse):
     return any(kw in combined for kw in CENTER_KEYWORDS)
 
 def passes_filters(annonce):
-    prix   = annonce.get("prix")
-    pieces = annonce.get("pieces")
+    prix = annonce.get("prix")
     if prix and prix > MAX_PRICE:
         return False
-    if pieces and pieces > MAX_ROOMS:
+    if not annonce.get("centre_ville"):
         return False
     return True
 
