@@ -5,7 +5,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 from config import SCRAPE_INTERVAL_MINUTES, DELAY_BETWEEN_SITES, LOG_PATH
 from database import init_db, save_annonce, is_new, count_annonces
 from utils import normalize, passes_filters
-from notifier import send_telegram, send_summary
+from notifier import send_batch
 from scrapers import ALL_SCRAPERS
 
 os.makedirs("logs", exist_ok=True)
@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger("agent")
 
 def run_once():
-    nb = 0
+    nouvelles = []
     for name, fn in ALL_SCRAPERS:
         logger.info(f"─── Scraping {name} …")
         try: items = fn()
@@ -28,11 +28,12 @@ def run_once():
             if not a.get("url"): continue
             if not is_new(a["url"]): continue
             if save_annonce(a):
-                nb += 1
                 logger.info(f"NOUVELLE ▶ [{a['source']}] {a['titre'][:60]} | {a.get('prix','?')} CHF")
-                send_telegram(a)
+                nouvelles.append(a)
         time.sleep(DELAY_BETWEEN_SITES)
-    return nb
+    if nouvelles:
+        send_batch(nouvelles)
+    return len(nouvelles)
 
 def main():
     logger.info("🏠 Agent veille immobilière — Sion 1 pièce ≤ CHF 1000")
@@ -45,7 +46,6 @@ def main():
         except Exception as e: logger.error(f"Erreur : {e}"); nb = 0
         total = count_annonces()
         logger.info(f"✓ {nb} nouvelles | {total} total")
-        if passage % 12 == 0: send_summary(nb, total)
         time.sleep(SCRAPE_INTERVAL_MINUTES * 60)
 
 if __name__ == "__main__":
