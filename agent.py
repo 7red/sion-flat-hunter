@@ -6,6 +6,7 @@ from config import SCRAPE_INTERVAL_MINUTES, DELAY_BETWEEN_SITES, LOG_PATH
 from database import init_db, save_annonce, is_new, count_annonces
 from utils import normalize, passes_filters
 from notifier import send_batch
+from mailer import extract_agent_email, send_contact_email
 from scrapers import ALL_SCRAPERS
 
 os.makedirs("logs", exist_ok=True)
@@ -30,6 +31,11 @@ def run_once():
             if save_annonce(a):
                 logger.info(f"NOUVELLE ▶ [{a['source']}] {a['titre'][:60]} | {a.get('prix','?')} CHF")
                 nouvelles.append(a)
+                agent_email = extract_agent_email(a["url"])
+                if agent_email:
+                    send_contact_email(agent_email, a)
+                else:
+                    logger.info(f"Pas d'email trouvé pour {a['url']}")
         time.sleep(DELAY_BETWEEN_SITES)
     if nouvelles:
         send_batch(nouvelles)

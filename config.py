@@ -10,3 +10,10 @@ DELAY_BETWEEN_SITES     = 3
 HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/123.0.0.0 Safari/537.36", "Accept-Language": "fr-CH,fr;q=0.9"}
 DB_PATH  = "data/annonces.db"
 LOG_PATH = "logs/agent.log"
+
+SENDER_NAME     = "Fred TENGER"
+SENDER_PHONE    = "+41784050450"
+SENDER_EMAIL    = "scuderiafred@me.com"
+SENDER_PASSWORD = "swlx-khnc-fzgo-ixze"
+SMTP_HOST       = "smtp.mail.me.com"
+SMTP_PORT       = 587
