@@ -82,7 +82,37 @@ def scrape_anibis():
     return _generic_scrape("https://www.anibis.ch/fr/c/appartements-a-louer","Anibis","https://www.anibis.ch",{"q":"studio appartement sion","r":"1950"})
 
 def scrape_allegro():
-    return _generic_scrape("https://www.agence-allegro.ch/allegro-locations","Allégro Sion","https://www.agence-allegro.ch")
+    soup = get_soup("https://www.agence-allegro.ch/allegro-locations")
+    if not soup: return []
+    results = []
+    for card in soup.select("div.listing-item"):
+        link = card.select_one("a.listing-img-container[href]")
+        if not link: continue
+        href = link["href"].strip()
+        if not href or "fiche-location" not in href: continue
+        url = "https://www.agence-allegro.ch/" + href.lstrip("/")
+
+        # Adresse : le <a> avec l'icône fa-map-marker
+        adr_el = card.select_one("a i.fa-map-marker")
+        adresse = adr_el.parent.get_text(strip=True) if adr_el else ""
+
+        # Pièces et loyer dans la liste de détails
+        pieces, prix = None, None
+        for li in card.select("ul.listing-details li"):
+            txt = li.get_text(" ", strip=True)
+            b = li.select_one("b")
+            if not b: continue
+            if "pièce" in txt.lower() or "piece" in txt.lower():
+                try: pieces = float(b.get_text(strip=True).replace(",","."))
+                except: pass
+            if "loyer" in txt.lower():
+                raw = b.get_text(strip=True).replace("\u00a0","").replace("'","").replace(" ","")
+                m = re.search(r"(\d{3,5})", raw)
+                if m: prix = int(m.group(1))
+
+        results.append({"source":"Allégro Sion","titre":"","prix":prix,"pieces":pieces,"adresse":adresse,"url":url})
+    logger.info(f"Allégro Sion : {len(results)} annonces")
+    return results
 
 def scrape_gerofinance():
     return _generic_scrape("https://www.gerofinance.ch/locations/appartements/valais/sion","Gerofinance","https://www.gerofinance.ch")
