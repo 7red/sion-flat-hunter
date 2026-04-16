@@ -49,7 +49,10 @@ def _generic_scrape(url, source, base_url, params=None):
         link = card.select_one("a[href]")
         if not link: continue
         href = link["href"]
-        if not href.startswith("http"): href = base_url + href
+        if not href.startswith("http"):
+            href = base_url.rstrip("/") + "/" + href.lstrip("/")
+        if href.rstrip("/") == base_url.rstrip("/") or href.endswith("#") or href == "#":
+            continue
         titre_el = card.select_one("h2,h3,[class*='title']")
         prix_el  = card.select_one("[class*='price'],[class*='prix'],[class*='loyer']")
         adr_el   = card.select_one("[class*='address'],[class*='location'],[class*='adresse'],[class*='lieu']")
